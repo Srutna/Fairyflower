@@ -10,6 +10,7 @@ level = Level(level_map, screen)
 
 running = True
 while running:
+    screen.fill("pink")
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
