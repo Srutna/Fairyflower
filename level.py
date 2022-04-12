@@ -1,14 +1,14 @@
 import pygame
 from tiles import Tile
 from settings import *
-from player import  *
+from player import  Player
 
 class Level:
     def __init__(self, level_data, surface):
         self.surface = surface
         self.screen_row = 12
         self.setup_level(level_data)
-        self.world_shift = 1
+        self.world_shift = 0
 
     def setup_level(self, layout):
         self.tiles = pygame.sprite.Group()
@@ -17,14 +17,12 @@ class Level:
         index = (len(layout) - self.screen_row) * (-1)
         for row_index, row in enumerate(layout):
             for col_index, cell in enumerate(row):
+                x = col_index * 50
+                y = index * 50
                 if cell == "X":
-                    x = col_index * 50
-                    y = index * 50
                     tile = Tile((x, y), tile_width, tile_height)
                     self.tiles.add(tile)
                 if cell == "P":
-                    x = col_index * 50
-                    y = index * 50
                     print(x,y)
                     temp = Player((x, y))
                     self.player.add(temp)
@@ -32,13 +30,32 @@ class Level:
 
     def scroll_x(self):
         player = self.player.sprite
-        player.y = player.rect.centery
-        direction_y = player.
+        player_x = player.rect.centerx
+        player_y = player.rect.centery
+        direction_x = player.direction.x
+        direction_y = player.direction.y
 
+        if player_y < screen_height / 3 and direction_y < 0:
+            self.world_shift = 4
+            player.speed = 0
+        elif player_y > screen_height - 100 and direction_y > 0:
+            self.world_shift = -4
+            player.speed = 0
+        else:
+            self.world_shift = 0
+            player.speed = 4
+
+        if player_x < 100 and direction_x < 0:
+            player.speed = 0
+        elif player_x > 500 and direction_x > 0:
+            player.speed = 0
+        else:
+            player.speed = 4
 
     def run(self):
         self.tiles.update(self.world_shift)
         self.tiles.draw(self.surface)
 
         self.player.update()
+        self.scroll_x()
         self.player.draw(self.surface)
